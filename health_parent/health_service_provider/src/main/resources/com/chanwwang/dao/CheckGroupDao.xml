@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.chanwwang.dao.CheckGroupDao">
+
+    <!--新增检查组-->
+    <insert id="add" parameterType="com.chanwwang.pojo.CheckGroup">
+        # 通过selectKey标签 获得自增的id的值 让id赋值到checkGroup的id属性上
+        <selectKey resultType="java.lang.Integer" order="AFTER" keyProperty="id">
+            select LAST_INSERT_ID()
+        </selectKey>
+        insert into t_checkgroup ( code, name, helpCode, sex, remark, attention)
+        VALUES
+        (#{code},#{name},#{helpCode},#{sex},#{remark},#{attention})
+    </insert>
+
+    <!--   设置检查组和检查项多对多关系 -->
+    <update id="setCheckGroupAndCheckItem" parameterType="map">
+        insert into t_checkgroup_checkitem (checkgroup_id, checkitem_id)
+        VALUES (#{checkGroupId}, #{checkItemId})
+    </update>
+
+<!--    编辑检查组数据-->
+    <update id="update" parameterType="com.chanwwang.pojo.CheckGroup">
+        update t_checkgroup
+        <set>
+            <if test="code != null">
+                code = #{code},
+            </if>
+            <if test="name != null">
+                name = #{name},
+            </if>
+            <if test="helpCode != null">
+                helpCode = #{helpCode},
+            </if>
+            <if test="sex != null">
+                sex = #{sex},
+            </if>
+            <if test="remark != null">
+                remark = #{remark},
+            </if>
+            <if test="attention != null">
+                attention = #{attention},
+            </if>
+        </set>
+        where id = #{id}
+    </update>
+
+    <!--    按条件查询-->
+    <select id="selectByCondition" parameterType="string" resultType="com.chanwwang.pojo.CheckGroup">
+        select id, code, name, helpCode, sex, remark, attention from t_checkgroup
+
+        <if test="queryString != null and queryString.length > 0">
+            where code = #{queryString} or name = #{queryString}
+            or helpCode = #{queryString}
+        </if>
+    </select>
+    <select id="selectById" resultType="com.chanwwang.pojo.CheckGroup">
+        select id, code, name, helpCode, sex, remark, attention
+        from t_checkgroup
+        where id = #{id}
+    </select>
+</mapper>
