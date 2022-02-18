@@ -20,6 +20,8 @@ public interface SetmealService {
 
     public Setmeal findById(Integer id);
 
+    public Setmeal findById4Detail(Integer id);
+
     public List<Setmeal> findAll();
 
     public List<Integer> findCheckGroupIdsBySetmealId(Integer id);

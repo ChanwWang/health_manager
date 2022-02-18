@@ -64,4 +64,11 @@
     <select id="selectAll" resultType="com.chanwwang.pojo.CheckItem">
         select id, code, name, sex, age, price, type, attention, remark from t_checkitem;
     </select>
+
+    <select id="selectCheckItemById" parameterType="int" resultType="com.chanwwang.pojo.CheckItem" >
+        select id, code, name, sex, age, price, type, attention, remark
+        from t_checkitem
+        where id
+        in (select checkitem_id from t_checkgroup_checkitem where checkgroup_id = #{id})
+    </select>
 </mapper>

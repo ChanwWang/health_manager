@@ -25,6 +25,7 @@ public interface SetmealDao {
 
     public Page<Setmeal> selectByCondition(@Param("queryString") String queryString);
 
+    public Setmeal selectById4Detail(Integer id);
     public Setmeal selectById(Integer id);
 
     public List<Setmeal> selectAll();

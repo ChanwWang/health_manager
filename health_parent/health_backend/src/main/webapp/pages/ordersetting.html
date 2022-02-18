@@ -105,7 +105,8 @@
                                                     </template>
                                                 </template>
                                             </template>
-                                            <button v-if="dayobject.day > today" @click="handleOrderSet(dayobject.day)"
+                                            <button v-if="dayobject.day > today"
+                                                    @click="handleOrderSet(dayobject.day)"
                                                     class="orderbtn">设置
                                             </button>
                                         </template>
@@ -144,6 +145,38 @@
         methods: {
             //预约设置
             handleOrderSet(day) {
+                this.$prompt('请输入可预约人数', '预约设置', {
+                    confirmButtonText: '确定',
+                    cancelButtonText: '取消',
+                    inputPattern: /^[0-9]*[1-9][0-9]*$/,
+                    inputErrorMessage: '只能输入正整数'
+                }).then(({value}) => {
+                    // this.$message({
+                    //     type: 'success',
+                    //     message: '你的输入是: ' + value
+                    // });
+
+                    axios.post("/ordersetting/editNumberByDate.do", {
+                        //日期yyyy-MM-dd
+                        orderDate: this.formatDate(day.getFullYear(), day.getMonth() + 1, day.getDate()),
+                        number: value //可预约人数
+                    }).then((resp) => {
+                        if (resp.data.flag) {
+                            //设置成功
+                            //调用初始化方法
+                            this.initData(this.formatDate(day.getFullYear(), day.getMonth() + 1, 1));
+                            this.$message.success(resp.data.message);
+                        } else {
+                            //操作失败
+                            this.$message.error(resp.data.message);
+                        }
+                    });
+                }).catch(() => {
+                    this.$message({
+                        type: 'info',
+                        message: '取消输入'
+                    });
+                });
             },
             //上传之前进行文件格式校验
             beforeUpload(file) {
@@ -237,11 +270,11 @@
                 //用于页面设置
                 axios.post("/ordersetting/getOrderSettingByMonth.do?date="
                     + this.currentYear + "-" + this.currentMonth).then((resp) => {
-                        if (resp.data.flag) {
-                            this.leftobj = resp.data.data;
-                        } else {
-                            this.$message.error(resp.data.message);
-                        }
+                    if (resp.data.flag) {
+                        this.leftobj = resp.data.data;
+                    } else {
+                        this.$message.error(resp.data.message);
+                    }
                 })
             },
             //切换到当前月份

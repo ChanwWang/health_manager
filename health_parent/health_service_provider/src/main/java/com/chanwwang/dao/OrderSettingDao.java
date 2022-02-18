@@ -4,6 +4,8 @@ import com.chanwwang.pojo.OrderSetting;
 import org.apache.poi.ss.formula.functions.Count;
 
 import java.util.Date;
+import java.util.List;
+import java.util.Map;
 
 /**
  * @author ChanwWang
@@ -16,4 +18,6 @@ public interface OrderSettingDao {
     public void editNumberByOrderDate(OrderSetting orderSetting);
 
     public long findCountByOrderDate(Date orderDate);
+
+    public List<OrderSetting> selectOrderSettingByMonth(Map map);
 }

@@ -3,6 +3,40 @@
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
 <mapper namespace="com.chanwwang.dao.SetmealDao">
 
+<!--    此处会使用mybatis提供的关联查询，在根据id查询套餐时，
+同时将此套餐包含的检查组都查询出来，并且将检查组包含的检查项都查询出来。-->
+    <resultMap type="com.chanwwang.pojo.Setmeal" id="baseResultMap">
+        <id column="id" property="id"/>
+        <result column="name" property="name"/>
+        <result column="code" property="code"/>
+        <result column="helpCode" property="helpCode"/>
+        <result column="sex" property="sex"/>
+        <result column="age" property="age"/>
+        <result column="price" property="price"/>
+        <result column="remark" property="remark"/>
+        <result column="attention" property="attention"/>
+        <result column="img" property="img"/>
+    </resultMap>
+
+
+    <resultMap type="com.chanwwang.pojo.Setmeal"
+               id="findByIdResultMap"
+               extends="baseResultMap">
+<!--        多对多映射 -->
+        <collection property="checkGroups"
+                    ofType="com.chanwwang.pojo.CheckGroup"
+                    select="com.chanwwang.dao.CheckGroupDao.selectCheckGroupById"
+                    column="id"
+                    >
+        </collection>
+    </resultMap>
+
+
+    <select id="selectById4Detail" resultMap="findByIdResultMap">
+        select id, name, code, helpCode, sex, age, price, remark, attention, img
+        from t_setmeal
+        where id = #{id}
+    </select>
     <!--新增套餐数据-->
     <insert id="add" parameterType="com.chanwwang.pojo.Setmeal">
         # 通过selectKey标签 获得自增的id的值 让id赋值到checkGroup的id属性上
@@ -71,11 +105,7 @@
         </if>
     </select>
 
-    <select id="selectById" resultType="com.chanwwang.pojo.Setmeal">
-        select id, name, code, helpCode, sex, age, price, remark, attention, img
-        from t_setmeal
-        where id = #{id}
-    </select>
+
 
     <select id="findCheckGroupIdsBySetmealId" parameterType="int" resultType="java.lang.Integer">
         select checkgroup_id from t_setmeal_checkgroup where setmeal_id=#{setmealId}
@@ -83,6 +113,11 @@
 
     <select id="selectAll" resultType="com.chanwwang.pojo.Setmeal">
         select id, name, code, helpCode, sex, age, price, remark, attention, img from t_setmeal
+    </select>
+
+    <select id="selectById" resultType="com.chanwwang.pojo.Setmeal">
+        select id, name, code, helpCode, sex, age, price, remark, attention, img
+        from t_setmeal where  id = #{id};
     </select>
 
     <!--    根据套餐id 清理当前套餐关联的检查组,操作中间关系表  -->

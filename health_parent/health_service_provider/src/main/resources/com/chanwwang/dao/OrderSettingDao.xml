@@ -16,8 +16,16 @@
             set number = #{number}
             where orderDate = #{orderDate}
     </update>
+
+<!--    根据日期查找是否已记录-->
     <select id="findCountByOrderDate" parameterType="date" resultType="java.lang.Long">
         select count(id) from t_ordersetting where orderDate = #{orderDate}
+    </select>
+
+<!--  根据日期范围查询-->
+    <select id="selectOrderSettingByMonth" parameterType="map" resultType="com.chanwwang.pojo.OrderSetting">
+        select id, orderDate, number, reservations from t_ordersetting
+        where orderDate between #{begin} and #{end}
     </select>
 
 

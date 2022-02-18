@@ -10,10 +10,18 @@ import com.chanwwang.pojo.Setmeal;
 import com.chanwwang.service.SetmealService;
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
+import freemarker.template.Configuration;
+import freemarker.template.Template;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.servlet.view.freemarker.FreeMarkerConfigurer;
 import redis.clients.jedis.JedisPool;
 
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.Writer;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -30,6 +38,10 @@ public class SetmealServiceImpl implements SetmealService {
     private JedisPool jedisPool;
     @Autowired
     private SetmealDao setmealDao;
+    @Autowired
+    private FreeMarkerConfigurer freeMarkerConfigurer;
+    @Value("${out_put_path}")
+    private String outPutPath;//从属性文件中读取的静态页面生成目录
 
     @Override
     //检查组分页查询
@@ -60,7 +72,10 @@ public class SetmealServiceImpl implements SetmealService {
         String fileName = setmeal.getImg();
         jedisPool.getResource().sadd(RedisConstant.SETMEAL_PIC_DB_RESOURCES, fileName);
 
+        //添加套餐后需要重新生成静态页面(套餐列表页面,套餐详情页面)
+        generateMobileStaticHtml();
     }
+
     //    更新套餐数据
     @Override
     public boolean update(Setmeal setmeal, Integer[] checkGroupIds) {
@@ -79,6 +94,8 @@ public class SetmealServiceImpl implements SetmealService {
         //重新建立当前检查组和检查项的关联关系
 
         addSetmealAndCheckGroup(setmealId, checkGroupIds);
+        //更新套餐后需要重新生成静态页面
+        generateMobileStaticHtml();
         return flag;
     }
 
@@ -88,13 +105,15 @@ public class SetmealServiceImpl implements SetmealService {
     public void deleteById(Integer id) {
         Setmeal setmeal = findById(id);
         String fileName = setmeal.getImg();
-        boolean flag = setmealDao.deleteById(id)>0;
-        if ( !flag ) {
-            throw  new RuntimeException();
+        boolean flag = setmealDao.deleteById(id) > 0;
+        if (!flag) {
+            throw new RuntimeException();
         }
         //将图片从Redis集合中删除
         jedisPool.getResource().srem(RedisConstant.SETMEAL_PIC_DB_RESOURCES, fileName);
         jedisPool.getResource().srem(RedisConstant.SETMEAL_PIC_RESOURCES, fileName);
+        //更新套餐后需要重新生成静态页面
+        generateMobileStaticHtml();
 
     }
 
@@ -114,6 +133,14 @@ public class SetmealServiceImpl implements SetmealService {
     }
 
 
+
+    //根据id查找套餐及详情
+    public Setmeal findById4Detail(Integer id) {
+        Setmeal setmeal = setmealDao.selectById4Detail(id);
+        return setmeal;
+    }
+
+
     //查询所有
     @Override
     public List<Setmeal> findAll() {
@@ -129,6 +156,69 @@ public class SetmealServiceImpl implements SetmealService {
                 map.put("checkGroupId", checkGroupId);
                 setmealDao.addSetmealAndCheckGroup(map);
             }
+        }
+    }
+
+    //生成当前方法所需的静态页面
+    public void generateMobileStaticHtml() {
+        //在生成静态页面之前查询数据
+        List<Setmeal> setmeals = setmealDao.selectAll();
+        //需要生成套餐列表页面
+        generateMobileSetmealListHtml(setmeals);
+        //需要生成套餐详情页面
+        generateMobileSetmealDetailHtml(setmeals);
+    }
+
+
+    //生成套餐列表页面
+    public void generateMobileSetmealListHtml(List<Setmeal> setmealList) {
+        Map map = new HashMap();
+        map.put("setmealList", setmealList);
+        generateHtml("mobile_setmeal.ftl", "m_setmeal.html", map);
+    }
+
+    //生成套餐详情页面(多个)
+    public void generateMobileSetmealDetailHtml(List<Setmeal> setmealList) {
+        for (Setmeal setmeal : setmealList) {
+            Map map = new HashMap();
+            map.put("setmeal", setmealDao.selectById4Detail(setmeal.getId()));
+            generateHtml("mobile_setmeal_detail.ftl",
+                    "setmeal_detail_" + setmeal.getId() + ".html",
+                    map);
+        }
+    }
+
+
+    /**
+     * 通用方法
+     * 用于生成静态页面
+     *
+     * @param templateName 模板名
+     * @param htmlPageName 生成文件名
+     * @param map          数据
+     */
+    public void generateHtml(String templateName, String htmlPageName,
+                             Map<String,Object> map) {
+        //获得配置对象
+        Configuration configuration = freeMarkerConfigurer.getConfiguration();
+        Writer out = null;
+        try {
+            Template template = configuration.getTemplate(templateName);
+            //构造输出流
+            out = new FileWriter(new File(outPutPath + "/" + htmlPageName));
+            //输出文件
+            template.process(map, out);
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            try {
+                if (out != null) {
+                    out.flush();
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
         }
     }
 }

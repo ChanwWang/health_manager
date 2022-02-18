@@ -2,6 +2,27 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
 <mapper namespace="com.chanwwang.dao.CheckGroupDao">
+    <resultMap type="com.chanwwang.pojo.CheckGroup" id="baseResultMap">
+        <id column="id" property="id"/>
+        <result column="name" property="name"/>
+        <result column="code" property="code"/>
+        <result column="helpCode" property="helpCode"/>
+        <result column="sex" property="sex"/>
+        <result column="remark" property="remark"/>
+        <result column="attention" property="attention"/>
+    </resultMap>
+
+    <resultMap type="com.chanwwang.pojo.CheckGroup"
+               id="findByIdResultMap"
+               extends="baseResultMap">
+<!--       检查组和检查项 多对多映射 -->
+        <collection property="checkItems"
+                    javaType="ArrayList"
+                    ofType="com.chanwwang.pojo.CheckItem"
+                    column="id"
+                    select="com.chanwwang.dao.CheckItemDao.selectCheckItemById">
+        </collection>
+    </resultMap>
 
     <!--新增检查组-->
     <insert id="add" parameterType="com.chanwwang.pojo.CheckGroup">
@@ -20,7 +41,7 @@
         VALUES (#{checkGroupId}, #{checkItemId})
     </update>
 
-<!--    编辑检查组数据-->
+    <!--    编辑检查组数据-->
     <update id="update" parameterType="com.chanwwang.pojo.CheckGroup">
         update t_checkgroup
         <set>
@@ -46,14 +67,18 @@
         where id = #{id}
     </update>
 
-<!--    根据检查组id 清理当前检查组关联的检查项,操作中间关系表 t_checkgroup_checkitem表-->
-    <delete id="deleteAssociation" parameterType="integer" >
-        delete from t_checkgroup_checkitem where  checkgroup_id = #{id};
+    <!--    根据检查组id 清理当前检查组关联的检查项,操作中间关系表 t_checkgroup_checkitem表-->
+    <delete id="deleteAssociation" parameterType="integer">
+        delete
+        from t_checkgroup_checkitem
+        where checkgroup_id = #{id};
     </delete>
 
-<!--    根据id删除检查组-->
-    <delete id="deleteById" parameterType="integer" >
-        delete  from  t_checkgroup where id = #{id}
+    <!--    根据id删除检查组-->
+    <delete id="deleteById" parameterType="integer">
+        delete
+        from t_checkgroup
+        where id = #{id}
     </delete>
 
     <!--    按条件查询-->
@@ -71,9 +96,20 @@
         where id = #{id}
     </select>
     <select id="selectCheckItemIdsByCheckGroupId" parameterType="int" resultType="java.lang.Integer">
-        select checkitem_id from t_checkgroup_checkitem where checkgroup_id=#{checkGroupId}
+        select checkitem_id
+        from t_checkgroup_checkitem
+        where checkgroup_id = #{checkGroupId}
     </select>
     <select id="selectAll" resultType="com.chanwwang.pojo.CheckGroup">
-        select id, code, name, helpCode, sex, remark, attention from t_checkgroup
+        select id, code, name, helpCode, sex, remark, attention
+        from t_checkgroup
+    </select>
+
+    <!--    根据套餐ID查询关联的检查组详情 -->
+    <select id="selectCheckGroupById" parameterType="int" resultMap="findByIdResultMap">
+        select id, code, name, helpCode, sex, remark, attention
+        from t_checkgroup
+        where id
+       in (select checkgroup_id from t_setmeal_checkgroup where setmeal_id = #{setmeal_id})
     </select>
 </mapper>
