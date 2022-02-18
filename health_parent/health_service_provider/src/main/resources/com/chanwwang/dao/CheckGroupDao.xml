@@ -46,6 +46,16 @@
         where id = #{id}
     </update>
 
+<!--    根据检查组id 清理当前检查组关联的检查项,操作中间关系表 t_checkgroup_checkitem表-->
+    <delete id="deleteAssociation" parameterType="integer" >
+        delete from t_checkgroup_checkitem where  checkgroup_id = #{id};
+    </delete>
+
+<!--    根据id删除检查组-->
+    <delete id="deleteById" parameterType="integer" >
+        delete  from  t_checkgroup where id = #{id}
+    </delete>
+
     <!--    按条件查询-->
     <select id="selectByCondition" parameterType="string" resultType="com.chanwwang.pojo.CheckGroup">
         select id, code, name, helpCode, sex, remark, attention from t_checkgroup
@@ -59,5 +69,11 @@
         select id, code, name, helpCode, sex, remark, attention
         from t_checkgroup
         where id = #{id}
+    </select>
+    <select id="selectCheckItemIdsByCheckGroupId" parameterType="int" resultType="java.lang.Integer">
+        select checkitem_id from t_checkgroup_checkitem where checkgroup_id=#{checkGroupId}
+    </select>
+    <select id="selectAll" resultType="com.chanwwang.pojo.CheckGroup">
+        select id, code, name, helpCode, sex, remark, attention from t_checkgroup
     </select>
 </mapper>

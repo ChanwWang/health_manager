@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.chanwwang.dao.SetmealDao">
+
+    <!--新增套餐数据-->
+    <insert id="add" parameterType="com.chanwwang.pojo.Setmeal">
+        # 通过selectKey标签 获得自增的id的值 让id赋值到checkGroup的id属性上
+        <selectKey resultType="java.lang.Integer" order="AFTER" keyProperty="id">
+            select LAST_INSERT_ID()
+        </selectKey>
+        insert into t_setmeal ( name, code, helpCode, sex, age, price, remark, attention, img)
+        VALUES
+        (#{name},#{code},#{helpCode},#{sex},#{age},#{price},#{remark},#{attention},#{img})
+    </insert>
+
+    <!--   设置套餐和检查组多对多关系 -->
+    <update id="addSetmealAndCheckGroup" parameterType="map">
+        insert into t_setmeal_checkgroup (setmeal_id, checkgroup_id)
+        VALUES (#{setmealId}, #{checkGroupId})
+    </update>
+
+<!--    编辑检查组数据-->
+    <update id="update" parameterType="com.chanwwang.pojo.Setmeal">
+        update t_setmeal
+        <set>
+            <if test="name != null">
+                name = #{name},
+            </if>
+            <if test="code != null">
+                code = #{code},
+            </if>
+            <if test="helpCode != null">
+                helpCode = #{helpCode},
+            </if>
+            <if test="sex != null">
+                sex = #{sex},
+            </if>
+            <if test="age != null">
+                age = #{age},
+            </if>
+            <if test="price != null">
+                price = #{price},
+            </if>
+            <if test="remark != null">
+                remark = #{remark},
+            </if>
+            <if test="attention != null">
+                attention = #{attention},
+            </if>
+            <if test="img != null">
+                img = #{img},
+            </if>
+        </set>
+        where id = #{id}
+    </update>
+
+
+    <!--    根据id删除检查组-->
+    <delete id="deleteById" parameterType="integer" >
+        delete  from  t_setmeal where id = #{id}
+    </delete>
+
+    <!--    按条件查询-->
+    <select id="selectByCondition" parameterType="string" resultType="com.chanwwang.pojo.Setmeal">
+        select id, name, code, helpCode, sex, age, price, remark, attention, img from t_setmeal
+
+        <if test="queryString != null and queryString.length > 0">
+            where code = #{queryString} or name = #{queryString}
+            or helpCode = #{queryString}
+        </if>
+    </select>
+
+    <select id="selectById" resultType="com.chanwwang.pojo.Setmeal">
+        select id, name, code, helpCode, sex, age, price, remark, attention, img
+        from t_setmeal
+        where id = #{id}
+    </select>
+
+    <select id="findCheckGroupIdsBySetmealId" parameterType="int" resultType="java.lang.Integer">
+        select checkgroup_id from t_setmeal_checkgroup where setmeal_id=#{setmealId}
+    </select>
+
+    <select id="selectAll" resultType="com.chanwwang.pojo.Setmeal">
+        select id, name, code, helpCode, sex, age, price, remark, attention, img from t_setmeal
+    </select>
+
+    <!--    根据套餐id 清理当前套餐关联的检查组,操作中间关系表  -->
+    <delete id="deleteAssociation" parameterType="integer" >
+        delete from t_setmeal_checkgroup where  setmeal_id = #{id};
+    </delete>
+</mapper>

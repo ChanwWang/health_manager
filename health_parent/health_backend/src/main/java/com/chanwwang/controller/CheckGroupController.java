@@ -38,6 +38,21 @@ public class CheckGroupController {
         return new Result(true, MessageConstant.ADD_CHECKGROUP_SUCCESS);
 
     }
+    //更新检查组信息,并将关联信息添加到关联表
+    @RequestMapping("/update")
+    public Result Update(@RequestBody CheckGroup checkGroup,Integer[] checkitemIds) {
+        try {
+            boolean flag = checkGroupService.update(checkGroup,checkitemIds);
+            if (!flag) {
+                throw  new RuntimeException();
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            //服务调用失败
+            return new Result(false, MessageConstant.EDIT_CHECKGROUP_FAIL);
+        }
+        return new Result(true, MessageConstant.EDIT_CHECKGROUP_SUCCESS);
+    }
 
     //分页查找检查项
     @RequestMapping("/findPage")
@@ -78,19 +93,34 @@ public class CheckGroupController {
         return new Result(true,MessageConstant.QUERY_CHECKITEM_SUCCESS,checkItemIds);
     }
 
-    //更新检查组信息,并将关联信息添加到关联表
-    @RequestMapping("/update")
-    public Result Update(@RequestBody CheckGroup checkGroup,Integer[] checkitemIds) {
+
+
+    //删除检查组信息,
+    @RequestMapping("/delete")
+    public Result delete(Integer id) {
         try {
-            boolean flag = checkGroupService.update(checkGroup,checkitemIds);
-            if (!flag) {
-                throw  new RuntimeException();
-            }
+            checkGroupService.deleteById(id);
+
         } catch (Exception e) {
             e.printStackTrace();
             //服务调用失败
-            return new Result(false, MessageConstant.EDIT_CHECKGROUP_FAIL);
+            return new Result(false, MessageConstant.DELETE_CHECKGROUP_FAIL);
         }
-        return new Result(true, MessageConstant.EDIT_CHECKGROUP_SUCCESS);
+        return new Result(true, MessageConstant.DELETE_CHECKGROUP_SUCCESS);
+    }
+
+    //查询所有检查组
+    @RequestMapping("/findAll")
+    public Result findAll() {
+        List<CheckGroup> checkGroups;
+        try {
+            checkGroups = checkGroupService.findAll();
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            //服务调用失败
+            return new Result(false, MessageConstant.QUERY_CHECKGROUP_FAIL);
+        }
+        return new Result(true, MessageConstant.QUERY_CHECKGROUP_SUCCESS,checkGroups);
     }
 }

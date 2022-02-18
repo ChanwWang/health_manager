@@ -3,6 +3,7 @@ package com.chanwwang.service;
 import com.chanwwang.entity.PageResult;
 import com.chanwwang.entity.QueryPageBean;
 import com.chanwwang.pojo.CheckGroup;
+import com.chanwwang.pojo.CheckItem;
 
 import java.util.List;
 
@@ -21,5 +22,9 @@ public interface CheckGroupService {
     public List<Integer> findCheckItemIdsByCheckGroupId(Integer id);
 
     public boolean update(CheckGroup checkGroup,Integer[] checkitemIds);
+
+    public void deleteById(Integer id);
+
+    public List<CheckGroup> findAll();
 
 }

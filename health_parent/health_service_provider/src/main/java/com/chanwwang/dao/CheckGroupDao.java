@@ -18,6 +18,8 @@ public interface CheckGroupDao {
     //新增检查组
     public void add(CheckGroup checkGroup);
 
+    //根据id删除检查组
+    public Integer deleteById(Integer id);
 
     public Page<CheckGroup> selectByCondition(@Param("queryString") String queryString);
 
@@ -27,10 +29,17 @@ public interface CheckGroupDao {
 
     public CheckGroup selectById(Integer id);
 
-    @Select("select count(*) from t_checkgroup_checkitem where checkgroup_id=#{checkGroupId}")
+
+
     public List<Integer> selectCheckItemIdsByCheckGroupId(Integer checkGroupId);
 
 
     public Integer update(CheckGroup checkGroup);
+
+    //根据检查组id 清理当前检查组关联的检查项,操作中间关系表 t_checkgroup_checkitem表
+    public Integer deleteAssociation(Integer id);
+
+    //查询所有
+    public List<CheckGroup> selectAll();
 
 }

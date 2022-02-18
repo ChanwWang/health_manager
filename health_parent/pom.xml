@@ -12,6 +12,7 @@
         <module>health_interface</module>
         <module>health_service_provider</module>
         <module>health_backend</module>
+        <module>health_jobs</module>
     </modules>
     <packaging>pom</packaging>
 <!--    父工程-->
@@ -176,10 +177,11 @@
                 <artifactId>jersey-client</artifactId>
                 <version>1.18.1</version>
             </dependency>
+<!--            七牛云存储-->
             <dependency>
                 <groupId>com.qiniu</groupId>
                 <artifactId>qiniu-java-sdk</artifactId>
-                <version>7.2.0</version>
+                <version>7.7.0</version>
             </dependency>
             <!--POI报表-->
             <dependency>
