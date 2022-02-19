@@ -1,7 +1,6 @@
 package com.chanwwang.dao;
 
 import com.chanwwang.pojo.OrderSetting;
-import org.apache.poi.ss.formula.functions.Count;
 
 import java.util.Date;
 import java.util.List;
@@ -20,4 +19,9 @@ public interface OrderSettingDao {
     public long findCountByOrderDate(Date orderDate);
 
     public List<OrderSetting> selectOrderSettingByMonth(Map map);
+
+    public OrderSetting selectByOrderDate(Date orderDate);
+
+    //更新已预约人数
+    public void editReservationsByOrderDate(OrderSetting orderSetting);
 }

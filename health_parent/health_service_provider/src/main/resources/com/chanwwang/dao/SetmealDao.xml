@@ -119,6 +119,12 @@
         select id, name, code, helpCode, sex, age, price, remark, attention, img
         from t_setmeal where  id = #{id};
     </select>
+    <select id="findSetmealCount" resultType="java.util.Map">
+        select s.name, count(o.id)  value
+            from t_setmeal s,t_order o
+            where o.setmeal_id = s.id
+            group by s.name
+    </select>
 
     <!--    根据套餐id 清理当前套餐关联的检查组,操作中间关系表  -->
     <delete id="deleteAssociation" parameterType="integer" >

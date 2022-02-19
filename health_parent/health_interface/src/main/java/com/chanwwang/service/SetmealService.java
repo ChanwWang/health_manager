@@ -6,6 +6,7 @@ import com.chanwwang.pojo.CheckGroup;
 import com.chanwwang.pojo.Setmeal;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 /**
@@ -29,4 +30,6 @@ public interface SetmealService {
     public boolean update(Setmeal setmeal,Integer[] checkgroupIds);
 
     public void deleteById(Integer id);
+
+    public List<Map<String,Object>> findSetmealCount();
 }

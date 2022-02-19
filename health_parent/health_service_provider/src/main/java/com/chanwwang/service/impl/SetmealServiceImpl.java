@@ -117,6 +117,12 @@ public class SetmealServiceImpl implements SetmealService {
 
     }
 
+    @Override
+    public List<Map<String, Object>> findSetmealCount() {
+
+        return setmealDao.findSetmealCount();
+    }
+
     //根据套餐ID查询关联的检查组ID
     @Override
     public List<Integer> findCheckGroupIdsBySetmealId(Integer id) {

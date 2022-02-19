@@ -126,9 +126,36 @@
                         //在按钮上显示30秒倒计时
                         validateCodeButton = $("#validateCodeButton")[0];//锁定dom对象
                         clock = window.setInterval(doLoop,1000);//定时器方法,可以实现每隔指定时间调用指定的方法
+                        //发送ajax请求,为用户发送邮箱验证码
+                        axios.get("/validateCode/send4Order.do?email=" + email).then((resp) => {
+                            if (resp.data.flag) {
+                                //发送成功
+
+                            }else {
+                                //发送失败
+                                this.$message.error(resp.data.message);
+                            }
+                        })
                     },
                     //提交预约
                     submitOrder(){
+                        //对用户输入的身份证号进行校验
+                        var idCard = this.orderInfo.idCard;
+                        if (!checkIdCard(idCard)) {
+                            //身份证号输入不合法
+                            this.$message.error("身份证号码输入错误,请重新输入")
+                            return false;
+                        }
+                        //发送ajax请求,提交表单
+                        axios.post("/order/submit.do",this.orderInfo).then((resp) => {
+                            if (resp.data.flag) {
+                                //预约成功,跳转到成功页面
+                                window.location.href = "orderSuccess.html?orderId=" + resp.data.data;
+                            }else {
+                                //预约失败,提示信息
+                                this.$message.error(resp.data.message);
+                            }
+                        })
                     }
                 },
                 //钩子函数

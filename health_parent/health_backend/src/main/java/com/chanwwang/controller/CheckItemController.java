@@ -7,6 +7,7 @@ import com.chanwwang.entity.QueryPageBean;
 import com.chanwwang.entity.Result;
 import com.chanwwang.pojo.CheckItem;
 import com.chanwwang.service.CheckItemService;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -28,6 +29,7 @@ public class CheckItemController {
 
     //新增检查项
 //    @PostMapping
+    @PreAuthorize("hasAuthority('CHECKITEM_ADD')")//权限校验
     @RequestMapping("/add")
     public Result add(@RequestBody CheckItem checkItem) {
 
@@ -42,6 +44,7 @@ public class CheckItemController {
     }
 
     //分页查找检查项
+    @PreAuthorize("hasAuthority('CHECKITEM_QUERY')")//权限校验
     @RequestMapping("/findPage")
     public PageResult findPage(@RequestBody QueryPageBean queryPageBean) {
         PageResult pageResult = checkItemService.pageQuery(queryPageBean);
@@ -51,6 +54,7 @@ public class CheckItemController {
     }
 
     //删除检查项
+    @PreAuthorize("hasAuthority('CHECKITEM_DELETE')")//权限校验
     @RequestMapping("/delete")
     public Result delete(Integer id) {
 
@@ -65,6 +69,7 @@ public class CheckItemController {
     }
 
     //编辑检查项
+    @PreAuthorize("hasAuthority('CHECKITEM_EDIT')")//权限校验
     @RequestMapping("/update")
     public Result update(@RequestBody CheckItem checkItem) {
 
@@ -82,6 +87,7 @@ public class CheckItemController {
     }
 
     //查询检查项 通过id
+    @PreAuthorize("hasAuthority('CHECKITEM_QUERY')")//权限校验
     @RequestMapping("/findById")
     public Result findById(Integer id) {
         CheckItem checkItem;
@@ -97,6 +103,7 @@ public class CheckItemController {
     }
 
     //查询所有检查项
+    @PreAuthorize("hasAuthority('CHECKITEM_QUERY')")//权限校验
     @RequestMapping("/findAll")
     public Result findAll() {
         List<CheckItem> checkItems;

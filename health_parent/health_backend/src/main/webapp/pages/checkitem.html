@@ -231,6 +231,16 @@
             this.findPage();
         },
         methods: {
+            showMessage(r){
+                if(r == 'Error: Request failed with status code 403'){
+                    //权限不足
+                    this.$message.error('无访问权限');
+                    return false;
+                }else{
+                    this.$message.error('未知错误');
+                    return false ;
+                }
+            },
             //查询
             handleQuery() {
                 this.pagination.currentPage = 1;
@@ -260,6 +270,8 @@
 
                                 this.$message.error(resp.data.message);
                             }
+                        }).catch((resp) => {
+                            this.showMessage(resp);
                         });
                     } else {
                         //校验不通过
@@ -279,7 +291,9 @@
                 axios.post("/checkitem/findPage.do", param).then((resp) => {
                     this.pagination.total = resp.data.total;
                     this.dataList = resp.data.rows;
-                })
+                }).catch((resp) => {
+                    this.showMessage(resp);
+                });
             },
             // 重置表单
             resetForm() {
@@ -300,6 +314,8 @@
                     } else {
                         this.$message.error(resp.data.message);
                     }
+                }).catch((resp) => {
+                    this.showMessage(resp);
                 });
 
                 this.dialogFormVisible4Edit = true;
@@ -319,6 +335,8 @@
                                 //编辑失败
                                 this.$message.error(resp.data.message);
                             }
+                        }).catch((resp) => {
+                            this.showMessage(resp);
                         }).finally(() => {
                             //关闭弹窗
                             this.dialogFormVisible4Edit = false;
@@ -349,6 +367,8 @@
                         } else {//操作失败
                             this.$message.error(resp.data.message);
                         }
+                    }).catch((resp) => {
+                        this.showMessage(resp);
                     }).finally(() => {
                         //重新查询全部
 

@@ -11,6 +11,10 @@ import java.util.Map;
  * 邮箱相关工具类
  */
 public class EmailUtils {
+    public static final String VALIDATE_CODE = "EMAIL_159620392";//发送邮箱验证码
+    //模板样式: 您的验证码为${code},有效时间为5分钟
+    public static final String ORDER_NOTICE = "EMAIL_159771588";//体检预约成功通知
+    //模板样式:您已成功预约健康体检,体检时间为${code}
 
     public static void initEmail(HtmlEmail email){
         email.setHostName("smtp.qq.com");//邮箱的SMTP服务器
@@ -30,12 +34,30 @@ public class EmailUtils {
         }
     }
 
-    public static Integer sendValidateCodeEmail(Map<String,String> map) {
+    public static void sendValidateCodeEmail(String templateCode,String emailAddress,String param) throws EmailException {
+        // 设置超时时间-可自行调整
+        System.setProperty("sun.net.client.defaultConnectTimeout", "10000");
+        System.setProperty("sun.net.client.defaultReadTimeout", "10000");
+
         HtmlEmail email = new HtmlEmail();
         initEmail(email);
-        String receiver = map.get("receiver");
 
-        return null;
+        email.addTo(emailAddress);
+        String subject ="";
+        if (VALIDATE_CODE.equals(templateCode)) {
+            subject="[XX健康系统]用户验证码";
+            email.setMsg("亲爱的用户,您的验证码为:" + param + ",5分钟内有效");
+        }else if (ORDER_NOTICE.equals(templateCode)) {
+            subject="[XX健康系统]您已预约成功";
+            email.setMsg("亲爱的用户,您已成功预约在 " + param + " 的体检");
+
+        }
+        email.setSubject(subject);
+
+        email.send();
+
+
+
     }
 
 

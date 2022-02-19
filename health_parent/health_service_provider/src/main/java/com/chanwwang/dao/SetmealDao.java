@@ -36,4 +36,6 @@ public interface SetmealDao {
 
     //根据套餐id 清理当前套餐关联的检查组,操作中间关系表
     public Integer deleteAssociation(Integer id);
+
+    public List<Map<String,Object>> findSetmealCount();
 }
